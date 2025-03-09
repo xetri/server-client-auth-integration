@@ -17,7 +17,6 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@elysiajs/cookie": "^0.8.0",
     "@elysiajs/cors": "^1.2.0",
     "bcrypt": "^5.1.1",
     "elysia": "^1.2.25",
