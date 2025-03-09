@@ -1,0 +1,31 @@
+{
+  "name": "backend-sangeet",
+  "module": "server.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run .",
+    "dev": "bun --watch ."
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.9",
+    "@types/minio": "^7.1.1",
+    "@types/nodemailer": "^6.4.17"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@elysiajs/cookie": "^0.8.0",
+    "@elysiajs/cors": "^1.2.0",
+    "bcrypt": "^5.1.1",
+    "elysia": "^1.2.25",
+    "jsonwebtoken": "^9.0.2",
+    "minio": "^8.0.4",
+    "nodemailer": "^6.10.0",
+    "pg": "^8.13.3",
+    "typeorm": "^0.3.21",
+    "zod": "^3.24.2"
+  }
+}
