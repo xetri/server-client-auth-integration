@@ -8,7 +8,8 @@ import styles from '#css/SignUp.module.scss';
 
 type CreateAccountResponse = {
     success: boolean,
-    error?: string
+    userId: string,
+    error: string
 }
 
 export default function SignUp() {
@@ -22,6 +23,7 @@ export default function SignUp() {
             const resp = await axios.post(api('auth/signup'),
                 { email, name, password },
                 {
+                    withCredentials: true,
                     headers: {
                         "Content-Type": "application/json"
                     }
@@ -49,12 +51,9 @@ export default function SignUp() {
         //     //TODO: notify
         //     console.error("Invalid email")
         //     return;
-        // }
 
-        const { success } = await createAccount();
-        if (success) {
-            redirect('/');
-        }
+        const { success, userId } = await createAccount();
+
     }
     
 

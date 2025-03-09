@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 import db from '#/db';
 import { User } from '#/db/entity';
-import { cookieSessionName, authSign } from '#/utils';
+import { cookieSessionName, saveSession} from '#/utils';
 
 const SignInDataScheme = z.object({
     email: z.string(),
@@ -47,26 +47,16 @@ export default async function(c: Context) {
             };
         }
     
-        // authSign(c, user.userId);
+        const session = await saveSession(user.userId);
 
-        const cookieSessionName = "mySession";
-        const sessionId = "12345";
-        const expiresAt = new Date(Date.now() + 3600000); // 1 hour
-    
-        c.set.headers["Set-Cookie"] = `${cookieSessionName}=${sessionId}; HttpOnly; SameSite=Strict; Path=/; Expires=${expiresAt.toUTCString()}`;
+        c.cookie[cookieSessionName].value = session.sessionId;
+        c.cookie[cookieSessionName].httpOnly = true;
+        c.cookie[cookieSessionName].sameSite = 'strict';
+        c.cookie[cookieSessionName].path = '/';
+        c.cookie[cookieSessionName].secure = false;
+        c.cookie[cookieSessionName].expires = session.expiresAt;
 
-        //@ts-ignore
-        // c.cookie[cookieSessionName] = {};
-        // console.log(c.cookie)
-        // c.setCookie(cookieSessionName, "cook", {
-        //     httpOnly: true,
-        //     sameSite: 'strict',
-        //     path: '/',
-        //     secure: false,
-        //     // expires: expiresAt,
-        // });
-
-        return { success: true }
+        return { success: true, userId : user.userId };
     } catch(error: any) {
         console.error(error);
 

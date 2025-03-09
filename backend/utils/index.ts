@@ -1,5 +1,5 @@
 export * from '#utils/uid';
-export * from '#/utils/sign';
+export * from '#/utils/session';
 
 export const jwtSecretKey = Bun.env.JWT_SECRET_KEY || 'SECRET-KEY';
 export const cookieSessionName = 'session_id';

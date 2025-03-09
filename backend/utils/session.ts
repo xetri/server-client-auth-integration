@@ -1,11 +1,10 @@
-import { Cookie, type Context } from 'elysia';
 import jwt from 'jsonwebtoken';
 
 import db from '#/db';
 import { Session } from '#db/entity';
-import { cookieSessionName, jwtSecretKey, sessionTimeout } from '#/utils';
+import { jwtSecretKey, sessionTimeout } from '#/utils';
 
-export async function authSign(c: Context, userId: string) {
+export async function saveSession(userId: string) {
     const expiresAt = sessionTimeout();
     const sessionId = jwt.sign({ userId, exp: expiresAt.getTime() / 1000 }, jwtSecretKey, { algorithm: 'HS512' });
 
@@ -16,14 +15,7 @@ export async function authSign(c: Context, userId: string) {
     });
     await sessionRepo.insert(session);
 
-    //@ts-ignore
-    c.setCookie(cookieSessionName, sessionId, {
-        httpOnly: true,
-        sameSite: 'strict',
-        path: '/',
-        secure: false,
-        expires: expiresAt,
-    });
+    return { sessionId, expiresAt };
 }
 
-export default authSign;
+export default saveSession;

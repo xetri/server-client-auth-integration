@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import db from '#/db';
 import { User } from '#/db/entity';
-import { uuid, authSign } from '#/utils';
+import { uuid, saveSession, cookieSessionName } from '#/utils';
 
 const SignUpDataScheme = z.object({
     email: z.string(),
@@ -46,10 +46,17 @@ export default async function (c : Context) {
     
         await userRepo.insert(user);
     
-        authSign(c, user.userId);
+        const session = await saveSession(user.userId);
+
+        c.cookie[cookieSessionName].value = session.sessionId;
+        c.cookie[cookieSessionName].httpOnly = true;
+        c.cookie[cookieSessionName].sameSite = 'strict';
+        c.cookie[cookieSessionName].path = '/';
+        c.cookie[cookieSessionName].secure = false;
+        c.cookie[cookieSessionName].expires = session.expiresAt;
 
         c.set.status = 201;
-        return { success : true };
+        return { success : true, userId: user.userId };
     } catch(error : any) {
         c.set.status = 500;
         return { success: false, error: error.message };

@@ -12,14 +12,15 @@ export default () => {
         event.preventDefault();
 
         try {
-            const { success } = (await axios.post(api('auth/signin'), { email, password }, {
+            const { success, userId } = (await axios.post(api('auth/signin'), { email, password }, {
+                withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json',
                 }
             })).data;
             if (!success) return;
 
-            redirect('/');
+            // redirect('/');
 
         } catch(error : any) {
             if (error.response.status == 403) {

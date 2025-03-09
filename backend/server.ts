@@ -9,7 +9,6 @@ const app = new Elysia();
 
 app
 .use(cors())
-.use(cookie());
 
 app.use(api);
 

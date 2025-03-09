@@ -20,8 +20,7 @@ export default async function(c : Context) {
 
     if(session) await sessionRepo.remove(session);
 
-    //@ts-ignore
-    c.removeCookie(cookieSessionName);
+    c.cookie[cookieSessionName].remove();
 
     return { success: true };
 }
