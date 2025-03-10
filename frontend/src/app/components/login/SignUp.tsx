@@ -1,40 +1,39 @@
-import React, { useState } from 'react';
-import { redirect } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-import { api } from '#utils/api';
+import { api, useAuth }  from '#/app/utils';
+import type { UserMeta } from '#/app/utils';
 // import { isValidEmail } from '#utils/validity';
 import styles from '#css/SignUp.module.scss';
 
 type CreateAccountResponse = {
-    success: boolean,
-    userId: string,
-    error: string
+    success: boolean;
+    user: UserMeta;
+    error: string;
 }
 
 export default function SignUp() {
+    const navigate = useNavigate();
+    const auth = useAuth();
+
     const [email, setEmail] = useState<string>('');
     const [name, setName] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const [confirmPassword, setConfirmPassword] = useState<string>('');
 
     const createAccount = async () : Promise<CreateAccountResponse> => {
-        try {
-            const resp = await axios.post(api('auth/signup'),
-                { email, name, password },
-                {
-                    withCredentials: true,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
+        const resp = await axios.post(api('auth/signup'),
+            { email, name, password },
+            {
+                withCredentials: true,
+                headers: {
+                    "Content-Type": "application/json"
                 }
-            );
-
-            return resp.data
-        } catch(error : any) {
-            console.error(`[${error.response.status}] ${error.response.data.error}`)            
-            return error.response.data;
-        }
+            }
+        );
+        
+        return resp.data;
     }
 
     const signUp = async (event : any) => {
@@ -52,10 +51,16 @@ export default function SignUp() {
         //     console.error("Invalid email")
         //     return;
 
-        const { success, userId } = await createAccount();
+        try {
+            const { success, user } = await createAccount();
 
+            if (success) {
+                auth.login(user);
+            }
+        } catch(e: any) {
+            console.error(e.message);
+        }
     }
-    
 
     return (
         <div className={styles.wrapper}>
@@ -113,7 +118,7 @@ export default function SignUp() {
                     <button className={`${styles.btnSecondary}`} type="button"
                         onClick={
                             (_) => {
-                                return redirect("/login#signin");
+                                navigate("/login/signin");
                             }
                         }
                     >

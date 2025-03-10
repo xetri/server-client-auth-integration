@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { redirect } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { api } from '#utils/api';
+import { api, useAuth } from '#app/utils';
+import type { UserMeta } from '#/app/utils';
 import styles from '#css/SignIn.module.scss';
 
 export default () => {
+    const navigate = useNavigate();
+    const auth = useAuth();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -12,7 +16,7 @@ export default () => {
         event.preventDefault();
 
         try {
-            const { success, userId } = (await axios.post(api('auth/signin'), { email, password }, {
+            const { success, user } : { success: boolean, user: UserMeta }  = (await axios.post(api('auth/signin'), { email, password }, {
                 withCredentials: true,
                 headers: {
                     'Content-Type': 'application/json',
@@ -20,8 +24,7 @@ export default () => {
             })).data;
             if (!success) return;
 
-            // redirect('/');
-
+            auth.login(user);
         } catch(error : any) {
             if (error.response.status == 403) {
 
@@ -63,7 +66,7 @@ export default () => {
                         />
                     </div>
                 </div>
-                <div className={styles.helperWrapper} onClick={() => {}}>
+                <div className={styles.helperWrapper} onClick={() => { navigate('/login/forgot-password') }}>
                     <span>
                         <p>Forgot Password ?</p>
                     </span>
@@ -76,7 +79,7 @@ export default () => {
                 <button className={`${styles.btnSecondary}`} type="button"
                     onClick={
                         (_) => {
-                            redirect('/login#signin');
+                            navigate('/login/signup');
                         }
                     }
                 >

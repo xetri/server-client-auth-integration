@@ -1,29 +1,19 @@
-import { useState, useEffect } from 'react';
-import SignIn from '#components/login/SignIn';
-import SignUp from "#components/login/SignUp";
-import ForgotPassword from '#components/login/ForgotPassword';
+import { useAuth } from '#/app/utils';
+import { useNavigate, Outlet } from 'react-router-dom';
 
 export default function Login() {
-    const [currentHash, setCurrentHash] = useState(window.location.hash);
+    const navigate = useNavigate();
+    const auth = useAuth();
 
-    useEffect(() => {
-        const handleHashChange = () => setCurrentHash(window.location.hash);
-        window.addEventListener('hashchange', handleHashChange);
-        return () => { window.removeEventListener('hashchange', handleHashChange); };
-    }, []);
-
-    switch(currentHash) {
-        case '#signup': {
-            return <SignUp/>
-        }
-        case '#signin': {
-            return <SignIn/>
-        }
-        case '#forgot-password': {
-            return <ForgotPassword/>
-        }
-        default:
-            window.location.hash = '#signin';
-            return <SignIn/>
+    if (auth.pending) {
+        return <div>Authenticating...</div>;
     }
+
+    if (auth.user) {
+        navigate('/');
+    }
+
+    return (
+        <Outlet/>
+    );
 }
