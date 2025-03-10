@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 import db from '#/db';
 import { User } from '#/db/entity';
-import { cookieSessionName, saveSession} from '#/utils';
+import { saveSession, saveCookie } from '#/utils';
 
 const SignInDataScheme = z.object({
     email: z.string(),
@@ -27,7 +27,7 @@ export default async function(c: Context) {
             where: {
                 email,
             },
-            select: ['userId', 'password']
+            select: ['userId', 'username', 'name', 'password']
         });
     
         if (!user) {
@@ -49,14 +49,9 @@ export default async function(c: Context) {
     
         const session = await saveSession(user.userId);
 
-        c.cookie[cookieSessionName].value = session.sessionId;
-        c.cookie[cookieSessionName].httpOnly = true;
-        c.cookie[cookieSessionName].sameSite = 'strict';
-        c.cookie[cookieSessionName].path = '/';
-        c.cookie[cookieSessionName].secure = false;
-        c.cookie[cookieSessionName].expires = session.expiresAt;
+        saveCookie(c.cookie, session.sessionId, session.expiresAt);
 
-        return { success: true, userId : user.userId };
+        return { success: true, user: { userId: user.userId, username: user.username, name: user.name } };
     } catch(error: any) {
         console.error(error);
 

@@ -1,10 +1,10 @@
 export * from '#utils/uid';
 export * from '#/utils/session';
+export * from '#/utils/cookie';
 
 export const jwtSecretKey = Bun.env.JWT_SECRET_KEY || 'SECRET-KEY';
 export const cookieSessionName = 'session_id';
-//1 year
-export const defaultValidSessionTime = 1 * 365 * 24 * 60 * 60 * 1000;
+export const defaultValidSessionTime = 3 * 365 * 24 * 60 * 60 * 1000;
 
 export const sessionTimeout = (validSinceNow: number = defaultValidSessionTime) => new Date(Date.now() + validSinceNow);
 

@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 import db from '#/db';
 import { User } from '#/db/entity';
-import { uuid, saveSession, cookieSessionName } from '#/utils';
+import { uuid, saveSession, saveCookie } from '#/utils';
 
 const SignUpDataScheme = z.object({
     email: z.string(),
@@ -40,6 +40,7 @@ export default async function (c : Context) {
         const user = userRepo.create({
             userId,
             email,
+            username: userId,
             name,
             password: hashedPassword,
         });
@@ -48,15 +49,10 @@ export default async function (c : Context) {
     
         const session = await saveSession(user.userId);
 
-        c.cookie[cookieSessionName].value = session.sessionId;
-        c.cookie[cookieSessionName].httpOnly = true;
-        c.cookie[cookieSessionName].sameSite = 'strict';
-        c.cookie[cookieSessionName].path = '/';
-        c.cookie[cookieSessionName].secure = false;
-        c.cookie[cookieSessionName].expires = session.expiresAt;
+        saveCookie(c.cookie, session.sessionId, session.expiresAt);
 
         c.set.status = 201;
-        return { success : true, userId: user.userId };
+        return { success: true, user: { userId: user.userId, username: user.username, name: user.name } };
     } catch(error : any) {
         c.set.status = 500;
         return { success: false, error: error.message };
